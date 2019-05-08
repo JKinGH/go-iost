@@ -1,39 +1,16 @@
 package sdk
 
 import (
-	"fmt"
 	"errors"
-	"github.com/iost-official/go-iost/account"
-	"github.com/iost-official/go-iost/common"
-	"github.com/iost-official/go-iost/crypto"
-	"github.com/iost-official/go-iost/rpc/pb"
+	"fmt"
+	"github.com/blocktree/OpenWallet/log"
 	"github.com/imroc/req"
 	"github.com/tidwall/gjson"
 	"net/http"
-	"github.com/blocktree/OpenWallet/log"
 	"testing"
 )
 
-// NewIOSTDevSDK creatimg an SDK with reasonable params
-func NewIOSTDevSDK1() *IOSTDevSDK {
-	keypair,_ := account.NewKeyPair(common.Base58Decode("2yquS3ySrGWPEKywCPzX4RTJugqRh7kJSo5aehsLYPEWkUxBWA39oMrZ7ZxuM4fgyXYs2cPwh5n8aNNpH5x2VyK1"), crypto.Ed25519)
 
-	return &IOSTDevSDK{
-		server:              "localhost:30002",
-		checkResult:         false,
-		checkResultDelay:    3,
-		checkResultMaxRetry: 20,
-		signAlgo:            "ed25519",
-		gasLimit:            1000000,
-		gasRatio:            1.0,
-		amountLimit:         []*rpcpb.AmountLimit{{Token: "*", Value: "unlimited"}},
-		expiration:          90,
-		chainID:             uint32(1024),
-		keyPair:			 keypair,
-		accountName:		 "admin",
-		verbose:  			 false,
-	}
-}
 
 // A Client is a Tron RPC client. It performs RPCs over HTTP using JSON
 // request and responses. A Client must be configured with a secret token
@@ -112,24 +89,6 @@ func (c * Client) SendTranscation(sign string)(txhash map[string]string, err err
 	return txhash, nil
 }
 
-func SignTX() string{
-
-	client := NewIOSTDevSDK1()
-
-	data := "[\"iost\", \"admin\", \"abcd1\", \"10\", \"\"]"
-	action := []*rpcpb.Action{NewAction("token.iost", "transfer", string(data))}
-
-	trx,err := client.CreateTxFromActions(action)
-	if err != nil {
-		fmt.Println("trx create failed")
-	}
-	//	fmt.Println("trx create successful")
-	signedTx, err := client.SignTx(trx, client.signAlgo)
-	if err != nil {
-
-	}
-	return MarshalTextString(signedTx)
-}
 
 func TestSingTX(t *testing.T) {
 	sign := SignTX()
